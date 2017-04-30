@@ -79,6 +79,7 @@ isNotDigit x = not $ isDigit x
 -the second parser is ((sat isNotDigit) >>= \_ -> allDigits) that try to parse a character and succeed as long as the character is not digit, or fail otherwise. when succeeded the parsed character will ignore by monadic bind then the function allDigit will be called again, when it fails then it will try the next parser.
 
 -the thrid parser ((many digit) >>= \c ->  allDigits >>= \cs -> return (c++cs)) will try to parser list of digits, and this function will keep calling itself recusively till the end of the string then return the parsed characters and return it using the succeed parser.
+
 -}
 allDigits :: Parser [Char]
 allDigits =( end >>= \_ -> return "" ) <|> ((sat isNotDigit) >>= \_ -> allDigits) <|> ( (many digit) >>= \c ->  allDigits >>= \cs -> return (c++cs))
