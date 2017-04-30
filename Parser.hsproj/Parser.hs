@@ -15,7 +15,11 @@ item = P (\inp -> case inp of
   [] -> []
   (x:xs) -> [(x,xs)])
  
-{- parser that check the end of the string -}
+{- a Parser that succeed if the end of the given string is reached or fail otherwise.
+for example :  
+  end "" will return a parser of string 
+  end "test" will fail
+-}
 end :: Parser [Char]
 end = P (\inp -> case inp of
   [] -> [("Ok","")]
