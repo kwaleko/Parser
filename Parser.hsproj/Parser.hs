@@ -73,6 +73,13 @@ digit = sat isDigit
 
 isNotDigit x = not $ isDigit x
 
---allDigits :: Parser [Char]
+{- AllDigit is a parser of string that parse all digit in a given string using the below method:
+-try a parser  (end >>= \_ -> return "") that check if the list of character has been consumed, if this parser fail then the next parser will be executed, if succeeded then it will return a parser of empty string with the remaining string is empty as well.
+
+-the second parser is ((sat isNotDigit) >>= \_ -> allDigits) that try to parse a character and succeed as long as the character is not digit, or fail otherwise. when succeeded the parsed character will ignore by monadic bind then the function allDigit will be called again, when it fails then it will try the next parser.
+
+-the thrid parser ((many digit) >>= \c ->  allDigits >>= \cs -> return (c++cs)) 
+- -}
+allDigits :: Parser [Char]
 allDigits =( end >>= \_ -> return "" ) <|> ((sat isNotDigit) >>= \_ -> allDigits) <|> ( (many digit) >>= \c ->  allDigits >>= \cs -> return (c++cs))
 
