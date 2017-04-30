@@ -1,0 +1,23 @@
+-- Haskell Playground 1.0
+
+
+
+main
+
+
+
+
+
+
+"1234h" ++ "" 
+
+
+
+
+
+
+
+parse allDigits "1While2trying3to4build5a6parser5thatcollect8every9numberin6astring4"
+
+parse allDigits "12d 4 dfsd 980 /.,3"
+
