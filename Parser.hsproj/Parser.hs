@@ -9,6 +9,7 @@ newtype Parser a = P (String -> [(a,String)])
 parse :: Parser a -> String -> [(a,String)]
 parse (P p) inp = p inp
 
+
 {- parser of character, it is the basic block in which all other parser that that consume one character will be constructed 
 -}
 item :: Parser Char
@@ -16,6 +17,7 @@ item = P (\inp -> case inp of
   [] -> []
   (x:xs) -> [(x,xs)])
  
+
 {- a Parser that succeed if the end of the given string is reached or fail otherwise.
 for example :  
   end "" will return a parser of string 
@@ -39,16 +41,20 @@ instance Functor Parser where
 {- pure transorm a value that always succeed with this value as its result, without consuming any of the input string 
 
   <*> applies a parser that returns a function to a parser that returns an argument to give a parser that 
-  returns the result of applying the function to the argument, and only succed if all the compponents succeed -}   
+  returns the result of applying the function to the argument, and only succed if all the compponents succeed 
+-} 
+    
 instance Applicative Parser where
   -- pure :: a -> Parser a
   pure val = P (\inp -> [(val,inp)])
   
+
   -- <*> :: Parser (a -> b) -> Parser a -> Parser b 
   pf <*> pv = P (\inp -> case parse pf inp of
     [] -> []
     [(g,out)] -> parse (fmap g pv) out)
-    
+ 
+   
 {- make the parser to be instance of Monad -}  
 instance Monad Parser  where
   -- (>>= ) :: Parser a -> (a -> Parser b) -> Parser c
@@ -58,12 +64,14 @@ instance Monad Parser  where
     
   fail _ = P (\inp -> [])
 
+
 {- a parse that take a predicate and parse the first character if the predicate is evluated to true and fail otherwise -}
 sat :: (Char -> Bool) -> Parser Char
 sat f = item >>= \x -> case f x of
   False -> fail "error"
   True -> return x 
-  
+ 
+ 
 instance Alternative Parser where
   --empty :: Parser a
   empty = P (\inp -> [])
@@ -72,14 +80,17 @@ instance Alternative Parser where
   p1 <|> p2 = P (\inp -> case parse p1 inp of 
     [] ->  parse p2 inp
     [(v,out)] -> [(v,out)])
-   
+ 
+  
 {- a parser that parser only digits -}
 digit :: Parser Char
 digit = sat isDigit
 
-{- if the character is digit the function will return True, False otherwise-}
+
+{- if the character is digit the function will return True, False otherwise -}
 isNotDigit :: Char -> Bool
 isNotDigit x = not $ isDigit x
+
 
 {- parseDigits is a parser of string that parse all digit in a given string using the below method:
 -try a parser  (end >>= \_ -> return "") that check if the list of character has been consumed, if this parser
@@ -92,8 +103,8 @@ then the function allDigit will be called again, when it fails then it will try 
 
 -the thrid parser ((many digit) >>= \c ->   >>= \cs -> return (c++cs)) will try to parser list of 
 digits, and this function will keep calling itself recusively till the end of the string then return the parsed 
-characters and return it using the succeed parser. -}
-
+characters and return it using the succeed parser. 
+-}
 parseDigits :: Parser [Char]
 parseDigits = end  <|> ((sat isNotDigit) >> parseDigits) <|> ((many digit) >>= \c -> parseDigits >>= \cs -> return (c++cs))
 
