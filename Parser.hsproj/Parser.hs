@@ -1,4 +1,4 @@
-module Parser (allDigits,parse) where 
+module Parser (allDigits,parse,parseDigits) where 
 
 import Control.Applicative 
 import Data.Char
@@ -92,6 +92,9 @@ digits, and this function will keep calling itself recusively till the end of th
 characters and return it using the succeed parser. -}
 allDigits :: Parser [Char]
 allDigits =(end >>= \_ -> return "") <|> ((sat isNotDigit) >>= \_ -> allDigits) <|> ((many digit) >>= \c -> allDigits >>= \cs -> return (c++cs))
+
+parseDigits :: Parser [Char]
+parseDigits = end  <|> ((sat isNotDigit) >> parseDigits) <|> ((many digit) >>= \c -> parseDigits >>= \cs -> return (c++cs))
 
 
 
