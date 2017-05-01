@@ -91,5 +91,7 @@ then the function allDigit will be called again, when it fails then it will try 
 digits, and this function will keep calling itself recusively till the end of the string then return the parsed 
 characters and return it using the succeed parser. -}
 allDigits :: Parser [Char]
-allDigits =( end >>= \_ -> return "" ) <|> ((sat isNotDigit) >>= \_ -> allDigits) <|> ( (many digit) >>= \c ->  allDigits >>= \cs -> return (c++cs))
+allDigits =(end >>= \_ -> return "") <|> ((sat isNotDigit) >>= \_ -> allDigits) <|> ((many digit) >>= \c -> allDigits >>= \cs -> return (c++cs))
+
+
 
