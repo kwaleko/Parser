@@ -1,4 +1,4 @@
-module Parser (allDigits,parse,parseDigits) where 
+module Parser (parse,parseDigits) where 
 
 import Control.Applicative 
 import Data.Char
@@ -9,8 +9,9 @@ newtype Parser a = P (String -> [(a,String)])
 parse :: Parser a -> String -> [(a,String)]
 parse (P p) inp = p inp
 
-{- parser of character, it is the basic block in which all other parser that that consume one character will be constructed -}
---item :: Parser Char
+{- parser of character, it is the basic block in which all other parser that that consume one character will be constructed 
+-}
+item :: Parser Char
 item = P (\inp -> case inp of
   [] -> []
   (x:xs) -> [(x,xs)])
@@ -22,7 +23,7 @@ for example :
 -}
 end :: Parser [Char]
 end = P (\inp -> case inp of
-  [] -> [("Ok","")]
+  [] -> [("","")]
   otherwise -> []
   )
   
@@ -76,22 +77,22 @@ instance Alternative Parser where
 digit :: Parser Char
 digit = sat isDigit
 
+{- if the character is digit the function will return True, False otherwise-}
+isNotDigit :: Char -> Bool
 isNotDigit x = not $ isDigit x
 
-{- AllDigit is a parser of string that parse all digit in a given string using the below method:
+{- parseDigits is a parser of string that parse all digit in a given string using the below method:
 -try a parser  (end >>= \_ -> return "") that check if the list of character has been consumed, if this parser
  fail then the next parser will be executed, if succeeded then it will return a parser of empty string with the
   remaining string is empty as well.
 
--the second parser is ((sat isNotDigit) >>= \_ -> allDigits) that try to parse a character and succeed as long 
+-the second parser is ((sat isNotDigit) >>= \_ -> ) that try to parse a character and succeed as long 
 as the character is not digit, or fail otherwise. when succeeded the parsed character will ignore by monadic bind 
 then the function allDigit will be called again, when it fails then it will try the next parser.
 
--the thrid parser ((many digit) >>= \c ->  allDigits >>= \cs -> return (c++cs)) will try to parser list of 
+-the thrid parser ((many digit) >>= \c ->   >>= \cs -> return (c++cs)) will try to parser list of 
 digits, and this function will keep calling itself recusively till the end of the string then return the parsed 
 characters and return it using the succeed parser. -}
-allDigits :: Parser [Char]
-allDigits =(end >>= \_ -> return "") <|> ((sat isNotDigit) >>= \_ -> allDigits) <|> ((many digit) >>= \c -> allDigits >>= \cs -> return (c++cs))
 
 parseDigits :: Parser [Char]
 parseDigits = end  <|> ((sat isNotDigit) >> parseDigits) <|> ((many digit) >>= \c -> parseDigits >>= \cs -> return (c++cs))
