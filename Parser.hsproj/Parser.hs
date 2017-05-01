@@ -5,13 +5,12 @@ import Data.Char
 
 newtype Parser a = P (String -> [(a,String)])
 
-{- function that remove the constructer and return the parser result -}
+--function that remove the constructer and return the parser result.
 parse :: Parser a -> String -> [(a,String)]
 parse (P p) inp = p inp
 
 
-{- parser of character, it is the basic block in which all other parser that that consume one character will be constructed 
--}
+-- parser of character, it is the basic block in which all other parser that that consume one character will be constructed. 
 item :: Parser Char
 item = P (\inp -> case inp of
   [] -> []
@@ -30,8 +29,7 @@ end = P (\inp -> case inp of
   )
   
 
-{- fmap applies a funtion to the result value of the parser if the parser succeed
-  , and propagates the failure otherwise -}
+-- fmap applies a funtion to the result value of the parser if the parser succeed, and propagates the failure otherwise.
 instance Functor Parser where
   -- fmap :: (a -> b) -> Parser a -> Parser b
   fmap f p = P (\inp -> case parse p inp of
@@ -55,7 +53,7 @@ instance Applicative Parser where
     [(g,out)] -> parse (fmap g pv) out)
  
    
-{- make the parser to be instance of Monad -}  
+-- make the parser to be instance of Monad. 
 instance Monad Parser  where
   -- (>>= ) :: Parser a -> (a -> Parser b) -> Parser c
   p >>= f = P (\inp -> case parse p inp of
@@ -65,7 +63,7 @@ instance Monad Parser  where
   fail _ = P (\inp -> [])
 
 
-{- a parse that take a predicate and parse the first character if the predicate is evluated to true and fail otherwise -}
+-- a parse that take a predicate and parse the first character if the predicate is evluated to true and fail otherwise.
 sat :: (Char -> Bool) -> Parser Char
 sat f = item >>= \x -> case f x of
   False -> fail "error"
@@ -82,12 +80,12 @@ instance Alternative Parser where
     [(v,out)] -> [(v,out)])
  
   
-{- a parser that parser only digits -}
+-- a parser that parser only digits.
 digit :: Parser Char
 digit = sat isDigit
 
 
-{- if the character is digit the function will return True, False otherwise -}
+-- if the character is digit the function will return True, False otherwise.
 isNotDigit :: Char -> Bool
 isNotDigit x = not $ isDigit x
 
