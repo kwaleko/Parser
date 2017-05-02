@@ -1,4 +1,4 @@
-module Parser (parse,parseDigits,Parser) where 
+module Parser (parse,parseDigits) where 
 
 import Control.Applicative 
 import Data.Char
@@ -8,8 +8,15 @@ import Types
 is a function from strings
 to list of pairs
 of things and strings -}
-newtype Parser a = P (String -> [(a,String)])
+newtype Parser a 
+  = P (String -> [(a,String)])
 
+-- Type of tags available in the text file.  
+data TextType 
+  = Title
+  | Body
+  deriving Show
+  
 --function that remove the constructer and return the parser result.
 parse :: Parser a -> String -> [(a,String)]
 parse (P p) inp = p inp
@@ -90,6 +97,15 @@ digit = sat isDigit
 isNotDigit :: Char -> Bool
 isNotDigit x = not $ isDigit x
 
+-- a parser that parser a specific char or fail otherwise.
+char :: Char -> Parser Char
+char x = sat (== x)
+
+-- string is a parser that parse a specific string
+string :: String -> Parser String
+string [] = return []
+string (x:xs) = char x >> string xs >> return (x:xs)
+
 
 {- parseDigits is a parser of string that parse all digit in a given string using the below method:
 -try a parser  (end >>= \_ -> return "") that check if the list of character has been consumed, if this parser
@@ -105,7 +121,38 @@ digits, and this function will keep calling itself recusively till the end of th
 characters and return it using the succeed parser. 
 -}
 parseDigits :: Parser [Char]
-parseDigits = end  <|> ((sat isNotDigit) >> parseDigits) <|> ((many digit) >>= \c -> parseDigits >>= \cs -> return (c++cs))
+parseDigits = end  
+  <|> ((sat isNotDigit) >> parseDigits) 
+  <|> ((many digit) >>= \c -> parseDigits >>= \cs -> return (c++cs))
+
+{- purpose of this parser to parse a text string form a  file and get the the [post]
+the file should look as the below :
+
+±Title± title for first post
+±Body± body for first post
+
+±Title± title for second post
+±Body± body for second post
+
+ ...
+-}
+parsePost :: Bool -> Parser [(Char,TextType)]
+parsePost isTitle =
+  let
+    style = if isTitle then Title else Body
+  in
+     (end >> pure [])
+     <|> (string "±Title±" >> parsePost (not isTitle))
+     <|> (string "±Body±" >> parsePost ( isTitle))
+     <|> (item >>= \c -> parsePost isTitle >>= (\cs -> return ((c , style) : cs)))
 
 
 
+
+
+
+
+
+
+
+  
