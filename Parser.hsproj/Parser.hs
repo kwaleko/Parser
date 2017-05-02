@@ -1,8 +1,13 @@
-module Parser (parse,parseDigits) where 
+module Parser (parse,parseDigits,Parser) where 
 
 import Control.Applicative 
 import Data.Char
+import Types
 
+{- a parser for things
+is a function from strings
+to list of pairs
+of things and strings -}
 newtype Parser a = P (String -> [(a,String)])
 
 --function that remove the constructer and return the parser result.
