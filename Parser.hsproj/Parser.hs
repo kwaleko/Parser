@@ -2,7 +2,7 @@ module Parser (parse,parseDigits) where
 
 import Control.Applicative 
 import Data.Char
-import Types
+--import Types
 
 {- a parser for things
 is a function from strings
@@ -15,6 +15,10 @@ newtype Parser a
 data TextType 
   = Title
   | Body
+  deriving Show
+  
+data Post 
+  = Post String String
   deriving Show
   
 --function that remove the constructer and return the parser result.
@@ -125,27 +129,33 @@ parseDigits = end
   <|> ((sat isNotDigit) >> parseDigits) 
   <|> ((many digit) >>= \c -> parseDigits >>= \cs -> return (c++cs))
 
-{- purpose of this parser to parse a text string form a  file and get the the [post]
-the file should look as the below :
 
-±Title± title for first post
-±Body± body for first post
 
-±Title± title for second post
-±Body± body for second post
-
- ... test
- ... test
+{- Parser of string that parse a string till it attend a given character then stop.
+for example : parser (ParseTill ';') "abc;def" will return [("abc","def")].
 -}
-parsePost :: Bool -> Parser [(Char,TextType)]
-parsePost isTitle =
-  let
-    style = if isTitle then Title else Body
-  in
-     (end >> pure [])
-     <|> (string "±Title±" >> parsePost (not isTitle))
-     <|> (string "±Body±" >> parsePost ( isTitle))
-     <|> (item >>= \c -> parsePost isTitle >>= (\cs -> return ((c , style) : cs)))
+parseTill :: Char ->  Parser String 
+parseTill char = end
+  <|> (sat (== char) >> return [])
+  <|> ( item >>= \c -> (parseTill char) >>= \cs -> return (c:cs))
+  
+{- Parser of string that split the string based on semi-colon.
+ex :
+"title;post;title2;post" -> ["title","post","title2","post"]
+-}
+parsePosts :: Parser [String]
+parsePosts =
+  (end >> return [])
+  <|> (parseTill ';' >>= \c -> parsePosts >>= \cs -> return (c:cs))
+  
+-- Convert a list of string to list of Post.
+beautify :: [String] -> [Post]
+beautify str = case str of 
+  [] -> []
+  (title:body:xs) -> (Post title body) : beautify xs
+  
+
+
 
 
 
