@@ -134,7 +134,8 @@ the file should look as the below :
 ±Title± title for second post
 ±Body± body for second post
 
- ...
+ ... test
+ ... test
 -}
 parsePost :: Bool -> Parser [(Char,TextType)]
 parsePost isTitle =
