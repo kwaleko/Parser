@@ -1,25 +1,30 @@
-module Parser (parse,parseDigits) where 
+module Parser (parse,parseDigits,Post) where 
 
 import Control.Applicative 
 import Data.Char
---import Types
+
+import Types 
+
+
+
+{-- Type of tags available in the text file.  
+data TextType 
+  = Title
+  | Body
+  deriving Show
+  -}
+  
+--data Post 
+ -- = Post String String
+ -- deriving Show
+ 
 
 {- a parser for things
 is a function from strings
 to list of pairs
 of things and strings -}
-newtype Parser a 
-  = P (String -> [(a,String)])
-
--- Type of tags available in the text file.  
-data TextType 
-  = Title
-  | Body
-  deriving Show
-  
-data Post 
-  = Post String String
-  deriving Show
+--newtype Parser a 
+ -- = P (String -> [(a,String)])
   
 --function that remove the constructer and return the parser result.
 parse :: Parser a -> String -> [(a,String)]
@@ -130,7 +135,6 @@ parseDigits = end
   <|> ((many digit) >>= \c -> parseDigits >>= \cs -> return (c++cs))
 
 
-
 {- Parser of string that parse a string till it attend a given character then stop.
 for example : parser (ParseTill ';') "abc;def" will return [("abc","def")].
 -}
@@ -148,22 +152,9 @@ parsePosts =
   (end >> return [])
   <|> (parseTill ';' >>= \c -> parsePosts >>= \cs -> return (c:cs))
   
--- Convert a list of string to list of Post.
+-- Convert a list of string to list of Post .
 beautify :: [String] -> [Post]
 beautify str = case str of 
   [] -> []
   (title:body:xs) -> (Post title body) : beautify xs
-  
-
-
-
-
-
-
-
-
-
-
-
-
-  
+ 
