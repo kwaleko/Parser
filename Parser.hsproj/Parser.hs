@@ -3,29 +3,9 @@ module Parser (parse,parseDigits,Post) where
 import Control.Applicative 
 import Data.Char
 
-import Types 
+import Types (Parser(..),Post(..))
 
 
-
-{-- Type of tags available in the text file.  
-data TextType 
-  = Title
-  | Body
-  deriving Show
-  -}
-  
---data Post 
- -- = Post String String
- -- deriving Show
- 
-
-{- a parser for things
-is a function from strings
-to list of pairs
-of things and strings -}
---newtype Parser a 
- -- = P (String -> [(a,String)])
-  
 --function that remove the constructer and return the parser result.
 parse :: Parser a -> String -> [(a,String)]
 parse (P p) inp = p inp
