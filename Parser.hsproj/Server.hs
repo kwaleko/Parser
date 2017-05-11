@@ -6,6 +6,7 @@
 module Server where
 
 import              Control.Monad.Trans.Except
+import              Control.Monad.Trans(liftIO)
 import              Data.Aeson
 import              Servant
 import              System.IO
@@ -13,7 +14,7 @@ import              Network.Wai
 import              Network.Wai.Handler.Warp
 
 
-import qualified    Types  as T
+import qualified    Types   as T
 import qualified    Parser  as P 
 
 -- * api
@@ -24,6 +25,8 @@ type ItemApi =
 
 itemApi :: Proxy ItemApi
 itemApi = Proxy
+
+
 
 -- * app
 main :: IO ()
@@ -43,14 +46,20 @@ mkApp = return $ serve itemApi server
 
 server :: Server ItemApi
 server =
-  getItems :<|>
+  getPosts :<|>
   getItemById
 
 getItems :: Handler [T.Post]
 getItems = return [exampleItem]
 
---getPosts :: Handler (IO String)
---getPosts = return $ getLine
+postList :: IO [T.Post]
+postList = do
+  inpStr <- readFile "/Users/lambda/dev/Parser/Parser.hsproj/Db/database.txt"
+  let [(result,_)] = P.parse (P.beautify <$> P.parsePosts) inpStr
+  return result
+
+getPosts :: Handler [T.Post]
+getPosts = liftIO postList :: Handler [T.Post]
 
 getItemById :: Integer -> Handler T.Post
 getItemById = \ case
