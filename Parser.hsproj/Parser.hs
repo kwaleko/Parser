@@ -1,9 +1,13 @@
-module Parser (parse,parseDigits,Post) where 
+module Parser  where 
 
-import Control.Applicative 
-import Data.Char
+import                Control.Applicative (Alternative(..),(<|>))
+import                Control.Monad(mapM)
+import                Data.Char(isDigit)
+import                Prelude hiding (break)
+import                Text.Read(readMaybe)
 
-import Types (Parser(..),Post(..))
+
+import                Types  (Parser(..),Article(..))
 
 
 --function that remove the constructer and return the parser result.
@@ -110,7 +114,8 @@ digits, and this function will keep calling itself recusively till the end of th
 characters and return it using the succeed parser. 
 -}
 parseDigits :: Parser [Char]
-parseDigits = end  
+parseDigits = 
+      end  
   <|> ((sat isNotDigit) >> parseDigits) 
   <|> ((many digit) >>= \c -> parseDigits >>= \cs -> return (c++cs))
 
@@ -119,22 +124,39 @@ parseDigits = end
 for example : parser (ParseTill ';') "abc;def" will return [("abc","def")].
 -}
 parseTill :: Char ->  Parser String 
-parseTill char = end
+parseTill char = 
+      end
   <|> (sat (== char) >> return [])
   <|> ( item >>= \c -> (parseTill char) >>= \cs -> return (c:cs))
   
-{- Parser of string that split the string based on semi-colon.
-ex :
-"title;post;title2;post" -> ["title","post","title2","post"]
--}
-parsePosts :: Parser [String]
-parsePosts =
+-- "title;post;title2;post" -> ["title","post","title2","post"]
+break :: Char -> Parser [String]
+break val =
   (end >> return [])
-  <|> (parseTill ';' >>= \c -> parsePosts >>= \cs -> return (c:cs))
+  <|> (parseTill val >>= \c -> (break val) >>= \cs -> return (c:cs))
   
--- Convert a list of string to list of Post .
-beautify :: [String] -> [Post]
-beautify str = case str of 
-  [] -> []
-  (title:body:xs) -> (Post title body) : beautify xs
+-- comments
+chunks :: [String] -> Maybe [(String,String,String)]
+chunks str = case str  of
+  [] -> Just[]
+  (id:title:content:xs) ->  ((id,title,content):) <$> (chunks xs)
+  _ -> Nothing
+  
+-- comments
+chunksToArticles :: Maybe [(String,String,String)] -> Maybe [Article]
+chunksToArticles val =  (map performChunk) <$> val
+
+-- comments
+performChunk :: (String,String,String) -> Article
+performChunk (id,title,content) = Article (readMaybe id :: Maybe Int) title content
+
+-- comments
+articlesLookup :: Maybe [Article] -> Maybe [(Maybe Int,Article)]
+articlesLookup val =map (\(Article id title content) -> (id,Article id title content)) <$> val
+
+
+
+
+
+
  

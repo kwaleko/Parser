@@ -1,34 +1,24 @@
-{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveGeneric              #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+
 module Types where
   
-import           GHC.Generics
+import            Control.Monad.Trans(MonadIO(..))
+import            GHC.Generics
   
-data Post = Post String String 
-  deriving Show 
-  
--- Type of tags available in the text file.  
-data TextType 
-  = Title
-  | Body
-  deriving Show
-  
+--import            Data.Time(UTCTime)
 
-{- 
-        a parser for things
-        is a function from strings
-        to list of pairs
-        of things and strings 
-        
--}
-newtype Parser a 
-  = P (String -> [(a,String)])
-  
-data Item
-  = Item {
-    itemId :: String,
-    itemText :: String
-  }
-  deriving (Eq, Show, Generic)
-  
+data Article = Article 
+    {
+     artId       ::  Maybe Int
+    ,artTitle    ::  String
+    ,artBody     ::  String
+    } deriving (Eq,Show,Generic)
+    
+-- a parser of things is a function from strings to list of pair of things and strings    
+newtype Parser a = P (String -> [(a,String)])
 
-
+-- file system and do not do any other monad.
+newtype HandleIO a = HandleIO { runHandleIO :: IO a }
+  deriving 
+    (Functor,Applicative,Monad)
