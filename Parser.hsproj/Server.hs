@@ -56,6 +56,10 @@ handleIOtoHandler (T.HandleIO action) =liftIO action
 listArticles :: Handler (Maybe [T.Article])
 listArticles =   handleIOtoHandler $ Db.getArticlesFromDB path
 
+--listArticles' :: Handler (Maybe [T.Article])
+--listArticles' =
+
+
 getArticle :: Int ->  Handler (Maybe T.Article)
 getArticle  = \ case 
   id -> handleIOtoHandler $ Db.getArticleById path id
