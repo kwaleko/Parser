@@ -62,7 +62,6 @@ articles =
       content <- till ';'
       rem     <- articles
       return $ Article (readMaybe id :: Maybe Int) title content : rem
- 
    
 split :: Char -> Parser [String]
 split val =
