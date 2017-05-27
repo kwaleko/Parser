@@ -52,17 +52,31 @@ or = (<|>)
 
 articles :: Parser [Article]
 articles =  
+     end >> return []
+     <|> 
      do
-      end
-      return []
-  `or` 
-     do
-      id      <- till ';'
-      title   <- till ';'
-      content <- till ';'
+      id      <- till '#'
+      title   <- till '#'
+      content <- till '#'
       rem     <- articles
       return $ Article (readMaybe id :: Maybe Int) title content : rem
-   
+      
+article :: String -> Parser Article
+article c =  
+     do
+      end
+      fail $ "Could not find the artivle " ++ show c
+  `or` 
+     do
+      id      <- till '#'
+      title   <- till '#'
+      content <- till '#'
+      if id == c 
+        then
+         return $ Article (readMaybe id :: Maybe Int) title content
+        else  article c
+
+       
 split :: Char -> Parser [String]
 split val =
   (end >> return [])
