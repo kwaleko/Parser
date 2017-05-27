@@ -1,14 +1,14 @@
-module   Parser       where 
+module  Parser    where 
 
 
-import                Control.Applicative ((<|>))
-import                Data.Char (isDigit)
-import                Data.Either(Either(..)) 
-import                Prelude hiding (break,or)
-import                Text.Read (readMaybe)
+import            Control.Applicative ((<|>))
+import            Data.Char (isDigit)
+import            Data.Either(Either(..)) 
+import            Prelude hiding (break,or)
+import            Text.Read (readMaybe)
 
 
-import                Types 
+import            Types 
 
 
 -- parse any character or fail if the end of the given string is reached  
@@ -47,26 +47,24 @@ till val =
    (end >> fail ("till parser : character " ++ show val ++ "is missing at the end")  )
   <|> (char val >> return [])
   <|> ( item >>= \c -> (till val) >>= \cs -> return (c:cs))
-   
-or = (<|>)
 
 articles :: Parser [Article]
-articles =  
-     end >> return []
-     <|> 
-     do
+articles =
+  (end >> return [])
+  <|>
+   do
       id      <- till '#'
       title   <- till '#'
       content <- till '#'
       rem     <- articles
       return $ Article (readMaybe id :: Maybe Int) title content : rem
-      
+          
 article :: String -> Parser Article
 article c =  
      do
-      end
+      end  
       fail $ "Could not find the artivle " ++ show c
-  `or` 
+  <|> 
      do
       id      <- till '#'
       title   <- till '#'
