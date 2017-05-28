@@ -12,7 +12,8 @@ module                DBUtils
                      ) where
   
 import                Control.Monad.Trans         (liftIO)
-import                Control.Monad.Trans.Reader  (ReaderT(..),ask)
+import                Control.Monad.Trans.Reader  (ask,ReaderT)
+import                Database.HDBC.Sqlite3       (Connection)
 import                Database.HDBC               ( 
                                                    commit
                                                   ,execute
@@ -23,57 +24,63 @@ import                Database.HDBC               (
                                                   ,run
                                                   ,SqlValue
                                                   )                                   
-import                Database.HDBC.Sqlite3       (Connection)
+
                                                    
                                                  
 import                Types 
 
-fromSqlToInt :: SqlValue -> Int
-fromSqlToInt sv = fromSql sv
 
-fromSqlToString :: SqlValue -> String
-fromSqlToString sv = fromSql sv
+fromSqlToInt    :: SqlValue -> Int
+fromSqlToInt sv = 
+  fromSql sv
 
--- Get a single value form table  
-sqlQueryOne ::     SQL 
-                -> [SqlValue] 
-                -> (SqlValue -> a) 
-                -> ReaderT Connection IO (Maybe a)
-sqlQueryOne sql sqlvals transform = do
+fromSqlToString   :: SqlValue -> String
+fromSqlToString sv = 
+  fromSql sv
+
+-- Get a single value form da  
+sqlQueryOne             ::   SQL 
+                          -> [SqlValue] 
+                          -> (SqlValue -> a) 
+                          -> ReaderT Connection IO (Maybe a)
+sqlQueryOne 
+  sql sqlvals transform = do
   conn <- ask
   stmt <- liftIO $ prepare conn sql
   liftIO $ execute stmt sqlvals
   row <- liftIO $ fetchRow  stmt
   return $ head . (map transform ) <$> row
  
--- Get a single value form table 
-sqlQueryAll ::    SQL 
-               -> [SqlValue] 
-               -> ([SqlValue] -> a) 
-               -> ReaderT Connection IO [a]
-sqlQueryAll sql sqlvals transform = do
+-- Get list of values form database 
+sqlQueryAll             ::   SQL 
+                          -> [SqlValue] 
+                          -> ([SqlValue] -> a) 
+                          -> ReaderT Connection IO [a]
+sqlQueryAll 
+  sql sqlvals transform = do
   conn <- ask
   stmt <- liftIO $ prepare conn sql
   liftIO $ execute stmt sqlvals
   rows <- liftIO $ fetchAllRows stmt
   return $ fmap transform rows
   
--- Execute statement that return no values
-sqlRun ::    SQL
-          -> [SqlValue]
-          -> ReaderT Connection IO ()          
-sqlRun  sql sqlvals= do
+-- Execute statement that returns no values
+sqlRun        ::   SQL
+                -> [SqlValue]
+                -> ReaderT Connection IO ()          
+sqlRun  
+  sql sqlvals = do
   conn <- ask
   stmt <- liftIO $ prepare conn sql 
   liftIO $ execute stmt sqlvals
   return ()
 
 -- Commit a database action  
-sqlCommit ::   ReaderT Connection IO () 
-            -> ReaderT Connection IO ()
+sqlCommit          ::   ReaderT Connection IO () 
+                     -> ReaderT Connection IO ()
 sqlCommit dbaction = do
   conn <- ask
-   dbaction
+  dbaction
   liftIO $ commit conn
   return () 
   
