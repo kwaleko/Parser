@@ -1,6 +1,15 @@
 {-# LANGUAGE RankNTypes #-}
 
-module    DBUtils     where
+module                DBUtils 
+                     (
+                       fromSqlToInt
+                      ,fromSqlToString
+                      ,sqlCommit
+                      ,sqlQueryOne
+                      ,sqlQueryAll
+                      ,sqlRun
+                     
+                     ) where
   
 import                Control.Monad.Trans         (liftIO)
 import                Control.Monad.Trans.Reader
