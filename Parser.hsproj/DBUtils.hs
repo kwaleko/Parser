@@ -59,17 +59,8 @@ sqlRun conn sql sqlvals= do
   stmt <- prepare conn sql 
   execute stmt sqlvals
   return ()
-  
-sqlRun' ::  
-             SQL
-          -> [SqlValue]
-          -> IO ()          
-sqlRun'  sql sqlvals= do
-  conn <- connectSqlite3 "db.txt"
-  stmt <- prepare conn sql 
-  execute stmt sqlvals
-  return ()
-  
+
+-- Commit a database action  
 sqlCommit ::   Connection
             -> IO () 
             -> IO ()
