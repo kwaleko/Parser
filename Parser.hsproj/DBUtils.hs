@@ -26,12 +26,6 @@ fromSqlToInt sv = fromSql sv
 fromSqlToString :: SqlValue -> String
 fromSqlToString sv = fromSql sv
 
-createTable ::Connection -> SQL -> IO Integer
-createTable conn query = do
-  r <- run conn query []
-  commit conn
-  return r
-
 -- Get a single value form table  
 sqlQueryOne ::     Connection 
                 -> SQL 
@@ -56,7 +50,7 @@ sqlQueryAll conn sql sqlvals transform = do
   rows <- fetchAllRows stmt
   return $ fmap transform rows
   
-
+-- Execute statement that return no values
 sqlRun :: Connection 
           -> SQL
           -> [SqlValue]
@@ -66,12 +60,21 @@ sqlRun conn sql sqlvals= do
   execute stmt sqlvals
   return ()
   
+sqlRun' ::  
+             SQL
+          -> [SqlValue]
+          -> IO ()          
+sqlRun'  sql sqlvals= do
+  conn <- connectSqlite3 "db.txt"
+  stmt <- prepare conn sql 
+  execute stmt sqlvals
+  return ()
   
-
+sqlCommit ::   Connection
+            -> IO () 
+            -> IO ()
+sqlCommit conn dbaction = do
+  dbaction
+  commit conn
+  return () 
   
-  
-  
-
-
-  
-
