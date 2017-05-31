@@ -3,7 +3,7 @@ module                DBInterface
                         addArticle
                        ,createUser 
                        ,dbSchema
-                       ,getArticle
+                       ,addArticle
                       ) 
                         where
   
@@ -17,8 +17,7 @@ import                Types
 
 
 -- Get Article title from db
-getArticleTitle          ::     ArticleId 
-                             -> ReaderT Connection IO (Maybe String)
+getArticleTitle          ::     ArticleId -> ReaderT Connection IO (Maybe String)
 getArticleTitle articleid = do
   conn <- ask 
   Db.sqlQueryOne sql [] Db.fromSqlToString 
@@ -40,8 +39,7 @@ dbSchema  = do
         ]
         
 -- add new Article
-addArticle  ::    Article 
-               -> ReaderT Connection IO ()
+addArticle  ::    Article -> ReaderT Connection IO ()
 addArticle
   article = do
     conn <- ask
@@ -53,8 +51,7 @@ addArticle
       sql = "insert into Articles (Title, Content ,UserId) values (?,?,?)"                
                    
  -- Add user to the database
-createUser      ::   User 
-                  -> ReaderT Connection IO ()
+createUser      ::   User -> ReaderT Connection IO ()
 createUser  
   user =  do
     conn <- ask
