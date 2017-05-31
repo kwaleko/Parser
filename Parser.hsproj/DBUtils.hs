@@ -23,12 +23,15 @@ import                Database.HDBC               (
                                                   ,prepare 
                                                   ,run
                                                   ,SqlValue
+                                                  ,toSql
                                                   )                                   
 
                                                    
                                                  
 import                Types 
 
+--fromAnyToSql    :: a -> SqlValue 
+--fromAnyToSql val   = toSql val
 
 fromSqlToInt    :: SqlValue -> Int
 fromSqlToInt sv = 
@@ -38,7 +41,7 @@ fromSqlToString   :: SqlValue -> String
 fromSqlToString sv = 
   fromSql sv
 
--- Get a single value form da  
+-- Get a single value form database  
 sqlQueryOne             ::   SQL 
                           -> [SqlValue] 
                           -> (SqlValue -> a) 
