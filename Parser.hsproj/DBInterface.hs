@@ -1,9 +1,8 @@
 module                DBInterface   
                       (
                         addArticle
-                       ,createUser 
+                       ,addUser
                        ,dbSchema
-                       ,addArticle
                       ) 
                         where
   
@@ -43,16 +42,16 @@ addArticle  ::    Article -> ReaderT Connection IO ()
 addArticle
   article = do
     conn <- ask
-    Db.sqlRun sql [ Db.toSql (artId    article)
-                   ,Db.toSql (artTitle article)
+    Db.sqlRun sql [ 
+Db.toSql (artTitle article)
                    ,Db.toSql (artBody  article) 
                    ]
     where
       sql = "insert into Articles (Title, Content ,UserId) values (?,?,?)"                
                    
  -- Add user to the database
-createUser      ::   User -> ReaderT Connection IO ()
-createUser  
+addUser      ::   User -> ReaderT Connection IO ()
+addUser  
   user =  do
     conn <- ask
     Db.sqlRun sql [Db.toSql (userAccount user)
@@ -62,12 +61,21 @@ createUser
       sql = " INSERT INTO users (account, name) VALUES (?,?)"
  
 
-{- 
-getArticle   ::    Id -> ReaderT Connection IO (Maybe Article)               
+-- Get single Article by id
+getArticle   ::    Id -> ReaderT Connection IO [WithId Article]               
 getArticle id = do
     conn <- ask
-    Db.sqlQueryOne sql [Db.toSql id] transform
+    Db.sqlQueryAll sql [Db.toSql id] transform
     where 
       sql = "SELECT (id,title,content) FROM articles where id = ? "
-      transform = \xs -> Article (Db.fromSqlToInt (xs !! 0)) (Db.fromSqlToString (xs !! 1)) (Db.fromSqlToString (xs !! 2)) -}
+      transform = \xs ->W (Db.fromSqlToInt (xs !! 0)) $ Article  (Db.fromSqlToString (xs !! 1)) (Db.fromSqlToString (xs !! 2)) 
+      
+-- get All Articles
+getArticles  :: ReaderT Connection IO [Article]               
+getArticles  =  do
+    conn <- ask
+    Db.sqlQueryAll sql [] transform
+    where 
+      sql = "SELECT (id,title,content) FROM articles "
+      transform = \xs -> Article (Db.fromSqlToInt (xs !! 0)) (Db.fromSqlToString (xs !! 1)) (Db.fromSqlToString (xs !! 2)) 
           
