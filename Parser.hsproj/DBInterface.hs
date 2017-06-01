@@ -42,8 +42,7 @@ addArticle  ::    Article -> ReaderT Connection IO ()
 addArticle
   article = do
     conn <- ask
-    Db.sqlRun sql [ 
-Db.toSql (artTitle article)
+    Db.sqlRun sql [ Db.toSql (artTitle article)
                    ,Db.toSql (artBody  article) 
                    ]
     where
@@ -68,14 +67,14 @@ getArticle id = do
     Db.sqlQueryAll sql [Db.toSql id] transform
     where 
       sql = "SELECT (id,title,content) FROM articles where id = ? "
-      transform = \xs ->W (Db.fromSqlToInt (xs !! 0)) $ Article  (Db.fromSqlToString (xs !! 1)) (Db.fromSqlToString (xs !! 2)) 
+      transform = \xs -> WithId (Db.fromSqlToInt (xs !! 0)) $ Article  (Db.fromSqlToString (xs !! 1)) (Db.fromSqlToString (xs !! 2)) 
       
 -- get All Articles
-getArticles  :: ReaderT Connection IO [Article]               
+getArticles  :: ReaderT Connection IO [WArticle]               
 getArticles  =  do
     conn <- ask
     Db.sqlQueryAll sql [] transform
     where 
       sql = "SELECT (id,title,content) FROM articles "
-      transform = \xs -> Article (Db.fromSqlToInt (xs !! 0)) (Db.fromSqlToString (xs !! 1)) (Db.fromSqlToString (xs !! 2)) 
+      transform = \xs -> WithId (Db.fromSqlToInt (xs !! 0)) $ Article  (Db.fromSqlToString (xs !! 1)) (Db.fromSqlToString (xs !! 2)) 
           
