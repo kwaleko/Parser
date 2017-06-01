@@ -54,8 +54,7 @@ addUser
   user =  do
     conn <- ask
     Db.sqlRun sql [ Db.toSql (userAccount user)
-                   ,Db.toSql (userName    user)]
-                   
+                   ,Db.toSql (userName    user)]                   
     where
       sql = " INSERT INTO users (account, name) VALUES (?,?)"
  
