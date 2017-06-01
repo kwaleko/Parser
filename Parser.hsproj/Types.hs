@@ -24,7 +24,6 @@ type DBConn a = forall conn. (IConnection conn) => ReaderT conn IO a
 
 data Article = Article 
     {
-
      artTitle    ::  String
     ,artBody     ::  String
     } 
@@ -43,6 +42,7 @@ newtype Parser a = Parser {
     parse :: String -> Either String (a,String) 
   }
   
+
 data WithId a = WithId { id :: Id , model :: a}
     
 
