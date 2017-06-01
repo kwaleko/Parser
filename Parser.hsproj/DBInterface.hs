@@ -53,8 +53,8 @@ addUser      ::   User -> ReaderT Connection IO ()
 addUser  
   user =  do
     conn <- ask
-    Db.sqlRun sql [Db.toSql (userAccount user)
-                   ,Db.toSql (userName   user)]
+    Db.sqlRun sql [ Db.toSql (userAccount user)
+                   ,Db.toSql (userName    user)]
                    
     where
       sql = " INSERT INTO users (account, name) VALUES (?,?)"
@@ -70,7 +70,7 @@ getArticle id = do
       transform = \xs -> WithId (Db.fromSqlToInt (xs !! 0)) $ Article  (Db.fromSqlToString (xs !! 1)) (Db.fromSqlToString (xs !! 2)) 
       
 -- get All Articles
-getArticles  :: ReaderT Connection IO [WArticle]               
+getArticles  :: ReaderT Connection IO [WithId Article]               
 getArticles  =  do
     conn <- ask
     Db.sqlQueryAll sql [] transform
