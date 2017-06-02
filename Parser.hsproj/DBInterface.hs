@@ -48,7 +48,6 @@ addUser
     where
       sql = " INSERT INTO users (account, name) VALUES (?,?)"
  
-
 -- Get single Article by id
 getArticle   ::    Id -> ReaderT Connection IO [WithId Article]               
 getArticle id = do
@@ -67,7 +66,6 @@ getArticles  =  do
       sql = "SELECT (id,title,content) FROM articles "
       transform = \xs -> WithId (Db.fromSqlToInt (xs !! 0)) $ Article  (Db.fromSqlToString (xs !! 1)) (Db.fromSqlToString (xs !! 2)) 
       
-
 -- Get user Name by id from table Users
 getUserName :: Id -> ReaderT Connection IO (Maybe String)
 getUserName id = do
@@ -80,5 +78,3 @@ getUserName id = do
 -- Get Article by Date
 getArticlesByDate :: ReaderT Connection IO [Article]
 getArticlesByDate = undefined
-
-          
