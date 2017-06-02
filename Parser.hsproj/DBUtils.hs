@@ -1,15 +1,18 @@
 {-# LANGUAGE RankNTypes #-}
 
 module                DBUtils 
-                     (
-                       fromSqlToInt
+                     ( 
+                      -- Commit data to DB
+                       cmdExecute
+                      ,cmdCommit
+                      -- convert sql value to types
+                      ,fromSqlToInt
                       ,fromSqlToString
-                      ,sqlCommit
-                      ,sqlQueryOne
-                      ,sqlQueryAll
-                      ,sqlRun
                       ,toSql                    
-                     ) 
+                      -- Select data from DB
+                      ,selectOne
+                      ,selectMany
+                      ) 
                       where
   
 import                Control.Monad.Trans         (liftIO)
@@ -36,33 +39,33 @@ import                Types
 
 connectDB = connectSqlite3
 
-fromSqlToInt    :: SqlValue -> Int
-fromSqlToInt sv = 
+fromSqlToInt      :: SqlValue -> Int
+fromSqlToInt sv   = 
   fromSql sv
 
 fromSqlToString   :: SqlValue -> String
 fromSqlToString sv = 
   fromSql sv
 
--- Get a single value form database  
-sqlQueryOne             ::   SQL 
+-- Get a single field form database  
+selectOne              ::     SQL 
                           -> [SqlValue] 
                           -> (SqlValue -> a) 
                           -> ReaderT Connection IO (Maybe a)
-sqlQueryOne 
+selectOne 
   sql sqlvals transform = do
   conn <- ask
   stmt <- liftIO $ prepare conn sql
   liftIO $ execute stmt sqlvals
   row <- liftIO $ fetchRow  stmt
-  return $ head . (map transform ) <$> row
+  return $ head . (map transform) <$> row
  
--- Get list of values form database 
-sqlQueryAll             ::   SQL 
+-- Get Multiple value from database
+selectMany             ::     SQL 
                           -> [SqlValue] 
                           -> ([SqlValue] -> a) 
                           -> ReaderT Connection IO [a]
-sqlQueryAll 
+selectMany 
   sql sqlvals transform = do
   conn <- ask
   stmt <- liftIO $ prepare conn sql
@@ -71,10 +74,10 @@ sqlQueryAll
   return $ fmap transform rows
   
 -- Execute statement that returns no values
-sqlRun        ::   SQL
-                -> [SqlValue]
-                -> ReaderT Connection IO ()          
-sqlRun  
+cmdExecute             ::     SQL
+                          -> [SqlValue]
+                          -> ReaderT Connection IO ()          
+cmdExecute  
   sql sqlvals = do
   conn <- ask
   stmt <- liftIO $ prepare conn sql 
@@ -82,9 +85,10 @@ sqlRun
   return ()
 
 -- Commit a database action  
-sqlCommit          ::   ReaderT Connection IO () 
-                     -> ReaderT Connection IO ()
-sqlCommit dbaction = do
+cmdCommit             ::   ReaderT Connection IO () 
+                        -> ReaderT Connection IO ()
+cmdCommit 
+  dbaction = do
   conn <- ask
   dbaction
   liftIO $ commit conn

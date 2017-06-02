@@ -15,22 +15,12 @@ import                Types
 
 
 
--- Get Article title from db
-getArticleTitle          ::     ArticleId -> ReaderT Connection IO (Maybe String)
-getArticleTitle articleid = do
-  conn <- ask 
-  Db.sqlQueryOne sql [] Db.fromSqlToString 
-    where
-      sql = unlines [
-         "SELECT articles.title FROM articles"
-        ," WHERE articles.id = ? "
-        ]
-        
--- create table Articles
+
+-- create tables 
 dbSchema  :: ReaderT Connection IO ()
 dbSchema  = do
   conn <- ask
-  Db.sqlRun sql []
+  Db.cmdExecute sql []
     where
       sql = unlines [
            "CREATE TABLE IF NOT EXISTS articles (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,date DEFAULT CURRENT_DATE ,title VARCHAR(80),content TEXT,userid INTEGER)"
@@ -42,7 +32,7 @@ addArticle  ::    Article -> ReaderT Connection IO ()
 addArticle
   article = do
     conn <- ask
-    Db.sqlRun sql [ Db.toSql (artTitle article)
+    Db.cmdExecute sql [ Db.toSql (artTitle article)
                    ,Db.toSql (artBody  article) 
                    ]
     where
@@ -53,7 +43,7 @@ addUser      ::   User -> ReaderT Connection IO ()
 addUser  
   user =  do
     conn <- ask
-    Db.sqlRun sql [ Db.toSql (userAccount user)
+    Db.cmdExecute sql [ Db.toSql (userAccount user)
                    ,Db.toSql (userName    user)]                   
     where
       sql = " INSERT INTO users (account, name) VALUES (?,?)"
@@ -63,7 +53,7 @@ addUser
 getArticle   ::    Id -> ReaderT Connection IO [WithId Article]               
 getArticle id = do
     conn <- ask
-    Db.sqlQueryAll sql [Db.toSql id] transform
+    Db.selectMany sql [Db.toSql id] transform
     where 
       sql = "SELECT (id,title,content) FROM articles where id = ? "
       transform = \xs -> WithId (Db.fromSqlToInt (xs !! 0)) $ Article  (Db.fromSqlToString (xs !! 1)) (Db.fromSqlToString (xs !! 2)) 
@@ -72,11 +62,23 @@ getArticle id = do
 getArticles  :: ReaderT Connection IO [WithId Article]               
 getArticles  =  do
     conn <- ask
-    Db.sqlQueryAll sql [] transform
+    Db.selectMany sql [] transform
     where 
       sql = "SELECT (id,title,content) FROM articles "
       transform = \xs -> WithId (Db.fromSqlToInt (xs !! 0)) $ Article  (Db.fromSqlToString (xs !! 1)) (Db.fromSqlToString (xs !! 2)) 
       
 
-getA
+-- Get user Name by id from table Users
+getUserName :: Id -> ReaderT Connection IO (Maybe String)
+getUserName id = do
+  conn <- ask
+  Db.selectOne sql [Db.toSql id] transform
+  where
+    sql       = "SELECT name FROM users WEHRE id = ? "
+    transform = \sqlValue -> Db.fromSqlToString sqlValue
+    
+-- Get Article by Date
+getArticlesByDate :: ReaderT Connection IO [Article]
+getArticlesByDate = undefined
+
           
