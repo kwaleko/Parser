@@ -3,6 +3,9 @@ module                DBInterface
                         addArticle
                        ,addUser
                        ,dbSchema
+                       ,getArticle
+                       ,getArticles
+                       ,getUserName
                       ) 
                         where
   
