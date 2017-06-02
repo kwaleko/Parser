@@ -76,4 +76,7 @@ getArticles  =  do
     where 
       sql = "SELECT (id,title,content) FROM articles "
       transform = \xs -> WithId (Db.fromSqlToInt (xs !! 0)) $ Article  (Db.fromSqlToString (xs !! 1)) (Db.fromSqlToString (xs !! 2)) 
+      
+
+getA
           

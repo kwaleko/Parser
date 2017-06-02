@@ -8,12 +8,13 @@ module                DBUtils
                       ,sqlQueryOne
                       ,sqlQueryAll
                       ,sqlRun
-                     
-                     ) where
+                      ,toSql                    
+                     ) 
+                      where
   
 import                Control.Monad.Trans         (liftIO)
 import                Control.Monad.Trans.Reader  (ask,ReaderT)
-import                Database.HDBC.Sqlite3       (Connection)
+import                Database.HDBC.Sqlite3       (Connection,connectSqlite3)
 import                Database.HDBC               ( 
                                                    commit
                                                   ,execute
@@ -32,6 +33,8 @@ import                Types
 
 --fromAnyToSql    :: a -> SqlValue 
 --fromAnyToSql val   = toSql val
+
+connectDB = connectSqlite3
 
 fromSqlToInt    :: SqlValue -> Int
 fromSqlToInt sv = 
