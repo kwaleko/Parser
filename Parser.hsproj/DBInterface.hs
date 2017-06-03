@@ -79,5 +79,10 @@ getUserName id = do
     transform = \sqlValue -> Db.fromSqlToString sqlValue
     
 -- Get Article by Date
-getArticlesByDate :: ReaderT Connection IO [Article]
-getArticlesByDate = undefined
+getArticlesByDate ::   Month 
+                    -> Year 
+                    -> ReaderT Connection IO [Article]
+getArticlesByDate 
+  month year = do
+     conn <- ask
+     Db.selectMany sql 
