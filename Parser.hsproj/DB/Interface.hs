@@ -1,4 +1,4 @@
-module                DBInterface   
+module                DB.Interface   
                       (
                         addArticle
                        ,addUser
@@ -13,7 +13,7 @@ import                Control.Monad.Trans.Reader  (ask,ReaderT)
 import                Database.HDBC.Sqlite3       (Connection)
 
 
-import qualified      DBUtils as Db
+import qualified      DB.Utils as Db
 import                Types
 
 
@@ -50,7 +50,17 @@ addUser
                        ,Db.toSql (userName    user)]                   
     where
       sql = " INSERT INTO users (account, name) VALUES (?,?)"
- 
+      
+getArticles :: QueryBy -> ReaderT Connection IO [WithId Article]
+getArticles (ById id) = do
+    conn <- ask
+    Db.selectMany sql [Db.toSql id] transform
+    where 
+      sql = "SELECT (id,title,content) FROM articles where id = ? "
+      transform = \xs -> WithId (Db.fromSqlToInt (xs !! 0)) $ Article  (Db.fromSqlToString (xs !! 1)) (Db.fromSqlToString (xs !! 2))
+getArticles' (ByUser )ll = undefined 2
+  
+{-  
 -- Get single Article by id
 getArticle   ::    Id -> ReaderT Connection IO [WithId Article]               
 getArticle id = do
@@ -58,16 +68,16 @@ getArticle id = do
     Db.selectMany sql [Db.toSql id] transform
     where 
       sql = "SELECT (id,title,content) FROM articles where id = ? "
-      transform = \xs -> WithId (Db.fromSqlToInt (xs !! 0)) $ Article  (Db.fromSqlToString (xs !! 1)) (Db.fromSqlToString (xs !! 2)) 
+      transform = \xs -> WithId (Db.fromSqlToInt (xs !! 0)) $ Article  (Db.fromSqlToString (xs !! 1)) (Db.fromSqlToString (xs  2)) -}
       
 -- get All Articles
-getArticles  :: ReaderT Connection IO [WithId Article]               
-getArticles  =  do
-    conn <- ask
+getArticles'  :: ReaderT Connection IO [WithId Article]               
+getArticles'  =  doconn <- ask
     Db.selectMany sql [] transform
     where 
       sql = "SELECT (id,title,content) FROM articles "
       transform = \xs -> WithId (Db.fromSqlToInt (xs !! 0)) $ Article  (Db.fromSqlToString (xs !! 1)) (Db.fromSqlToString (xs !! 2)) 
+    
       
 -- Get user Name by id from table Users
 getUserName :: Id -> ReaderT Connection IO (Maybe String)
@@ -78,11 +88,11 @@ getUserName id = do
     sql       = "SELECT name FROM users WEHRE id = ? "
     transform = \sqlValue -> Db.fromSqlToString sqlValue
     
--- Get Article by Date
+{- - Get Article by Date
 getArticlesByDate ::   Month 
                     -> Year 
                     -> ReaderT Connection IO [Article]
 getArticlesByDate 
   month year = do
      conn <- ask
-     Db.selectMany sql 
+     Db.selectMany sql [] -}

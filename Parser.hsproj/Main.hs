@@ -1,6 +1,7 @@
 import Parser
 import File 
 import System.IO
+import Types
 
  
 {- How to use the below function to parse digits in a given file:
@@ -12,12 +13,17 @@ import System.IO
   -then load the Main file in the REPL ( :load Main.hs )
   -now you can write main in the REPL and it will return the parsed string
 -}
-main :: IO ()
+ {- main :: IO String
 main = do
   inpStr <- readFile "/Users/lambda/Documents/createFile.txt"
   let [(result,_)] = parse parseDigits inpStr
-  putStr result
+  return result
+  -}
   
 
-
-
+  
+fn :: String -> [(Char, Char, Char)]                                                                                                                                                                    
+fn s = snd $ foldr toTriples ([], []) s where
+    toTriples :: Char -> (String, [(Char, Char, Char)]) -> (String, [(Char, Char, Char)])
+    toTriples c (cur, tups) | length cur < 2 = (c:cur, tups)
+    toTriples c (cur, tups) = ([], (c, cur!!0, cur!!1):tups)

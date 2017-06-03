@@ -4,12 +4,30 @@ cabal-version: 1.11
 build-type: Simple
 license: AllRightsReserved
 stability: experimental
+package-url: https://hackage.haskell.org/package/warp-3.2.6/docs/Network-Wai-Handler-Warp.html
+extra-source-files:
+    AppConfig.yaml
+    db.txt
 x-ghc-framework-version: 7.10.3-6.29-1
 x-last-ide-version: HfM1.4.0
 Executable Parser
   main-is: Main.hs
   buildable: True
   build-depends:
-      base -any
+      aeson -any,
+      mtl -any,
+      transformers -any,
+      HDBC -any,
+      base -any,
+      HDBC-sqlite3 -any,
+      servant-server -any,
+      wai -any,
+      warp -any
   other-modules:
+      Server
+      DB.Interface
+      DB.Articles
+      DB.Utils
+      Types
+      HandleIO
       Parser

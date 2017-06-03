@@ -1,0 +1,32 @@
+-- Haskell Playground 1.0
+
+
+Article 
+
+parse' (parseTill' ';') "hello; test;"
+
+
+Article
+
+Left 2 
+
+parse' (  (parseTill' ';') )"hello;omar;body"
+
+
+parse' (  (parseTill' ';') ) "omar"
+
+parse' (break' ';') "hello;om;ar"
+
+
+id 
+
+
+parse' parseChunks  "1;khaled;body;2;title2;body2;l3;t3;b3;i4;t4;b4;"
+
+parse (articles ) "11#djfjhd#hghh#13#title#body#14#title2#bdjjf#"
+
+parse ints "2222sd" 
+
+
+
+

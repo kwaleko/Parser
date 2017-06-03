@@ -5,11 +5,15 @@
 main
 
 
+fn :: String -> [(Char, Char, Char)]                                                                                                                                                                    
+fn s = snd $ foldr toTriples ([], []) s where
+    toTriples :: Char -> (String, [(Char, Char, Char)]) -> (String, [(Char, Char, Char)])
+    toTriples c (cur, tups) | length cur < 2 = (c:cur, tups)
+    toTriples c (cur, tups) = ([], (c, cur!!0, cur!!1):tups)
 
 
 
-
-"1234h" ++ "" 
+fn "khaaa"
 
 
 

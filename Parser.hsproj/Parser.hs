@@ -1,7 +1,12 @@
-module  Parser    where 
+module            Parser 
+                  (
+                   article
+                  ,articles
+                  )  
+                  where 
 
 
-import            Control.Applicative ((<|>))
+import            Control.Applicative ((<|>),many)
 import            Data.Char (isDigit)
 import            Data.Either(Either(..)) 
 import            Prelude hiding (break,or)
@@ -38,6 +43,9 @@ char x = sat (== x)
 digit :: Parser Char
 digit = sat isDigit
 
+ints :: Parser String
+ints = many digit
+
 string :: String -> Parser String
 string [] = return []
 string (x:xs) = char x >> string xs >> return (x:xs)
@@ -57,7 +65,8 @@ articles =
       title   <- till '#'
       content <- till '#'
       rem     <- articles
-      return $ Article (readMaybe id :: Maybe Int) title content : rem
+      
+      return $ WithId Article $ (read id ::  Int) title content : rem
           
 article :: String -> Parser Article
 article c =  
@@ -71,7 +80,7 @@ article c =
       content <- till '#'
       if id == c 
         then
-         return $ Article (readMaybe id :: Maybe Int) title content
+         return $ Article (read id ::  Int) title content
         else  article c
 
        

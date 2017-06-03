@@ -13,10 +13,18 @@ import                GHC.Generics
   
 --import            Data.Time(UTCTime)
 
-
 type SQL = String
 
+type Month = Int 
+
+type Year = Int 
+
 type Id = Int 
+
+data QueryBy =  ByDate String
+              | ByUser Int
+              | ById   Id 
+              | All
 
 type ArticleId = Int
 
@@ -26,6 +34,7 @@ data Article = Article
     {
      artTitle    ::  String
     ,artBody     ::  String
+    --,artUser     ::  User
     } 
     deriving (Eq,Show,Generic)
     
@@ -36,23 +45,13 @@ data User = User
         } deriving(Eq,Show)
     
 
-
-
 newtype Parser a = Parser { 
     parse :: String -> Either String (a,String) 
   }
   
-
+-- add id to a given , for selecting data from database.
 data WithId a = WithId { id :: Id , model :: a}
     
-
-
-
-
-
-
-
-
 -- file system and do not do any other monad.
 newtype HandleIO a = 
     HandleIO { runHandleIO :: IO a }

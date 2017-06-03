@@ -1,6 +1,6 @@
 {-# LANGUAGE RankNTypes #-}
 
-module                DBUtils 
+module                DB.Utils 
                      ( 
                       -- Commit data to DB
                        cmdExecute
@@ -60,7 +60,7 @@ selectOne
   row <- liftIO $ fetchRow  stmt
   return $ head . (map transform) <$> row
  
--- Get Multiple value from database
+-- Get a list Multiple fields from database
 selectMany             ::     SQL 
                           -> [SqlValue] 
                           -> ([SqlValue] -> a) 

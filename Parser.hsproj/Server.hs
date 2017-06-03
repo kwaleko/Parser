@@ -17,13 +17,13 @@ import              Network.Wai.Handler.Warp
 import qualified    Types     as T
 import qualified    Parser    as P 
 import qualified    HandleIO  as H
-import qualified    Database  as Db
+--import qualified    Database  as Db
 
 -- * api
 
 type ItemApi =
-       "Articles" :> Get '[JSON] (Maybe [T.Article]) 
-  :<|> "Articles" :> Capture "itemId" Int :> Get '[JSON] (Maybe T.Article)
+       "Articles" :> Get '[JSON] (Either String [T.Article]) 
+  :<|> "Articles" :> Capture "itemId" String :> Get '[JSON] (Either String  T.Article)
 
 itemApi :: Proxy ItemApi
 itemApi =  Proxy
@@ -53,14 +53,14 @@ handleIOtoHandler :: T.HandleIO a -> Handler a
 handleIOtoHandler (T.HandleIO action) =liftIO action
 
 
-listArticles :: Handler (Maybe [T.Article])
+listArticles :: Handler (Either String [T.Article])
 listArticles =   handleIOtoHandler $ Db.getArticlesFromDB path
 
 --listArticles' :: Handler (Maybe [T.Article])
 --listArticles' =
 
 
-getArticle :: Int ->  Handler (Maybe T.Article)
+getArticle :: String ->  Handler (Either String T.Article)
 getArticle  = \ case 
   id -> handleIOtoHandler $ Db.getArticleById path id
  -- _  -> throwE err404

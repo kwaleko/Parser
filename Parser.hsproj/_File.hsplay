@@ -1,0 +1,11 @@
+-- Haskell Playground 1.0
+:t liftM
+
+
+(/=)
+
+filter notDot 
+fmap (filter notDot) . getDirectoryContents
+
+getDirectoryContents
+
